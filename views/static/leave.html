@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Cuti - HRIS IDN</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/app.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="wrapper">
+        <nav id="sidebar" class="sidebar js-sidebar">
+            <div class="sidebar-content js-simplebar">
+                <a class="sidebar-brand" href="index.html">
+                    <span class="align-middle">HRIS IDN</span>
+                </a>
+
+                <ul class="sidebar-nav">
+                    <li class="sidebar-header">
+                        Menu
+                    </li>
+
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="index.html">
+                            <i class="align-middle" data-feather="home"></i> <span class="align-middle">Home</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="attendance.html">
+                            <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Absensi</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item active">
+                        <a class="sidebar-link" href="leave.html">
+                            <i class="align-middle" data-feather="coffee"></i> <span class="align-middle">Cuti</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="payroll.html">
+                            <i class="align-middle" data-feather="dollar-sign"></i> <span
+                                class="align-middle">Penghasilan</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+        </nav>
+
+        <div class="main">
+            <nav class="navbar navbar-expand navbar-light navbar-bg">
+                <a class="sidebar-toggle js-sidebar-toggle">
+                    <i class="hamburger align-self-center"></i>
+                </a>
+
+                <div class="navbar-collapse collapse">
+                    <ul class="navbar-nav navbar-align">
+                        <li class="nav-item dropdown">
+                            <a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#"
+                                data-bs-toggle="dropdown">
+                                <i class="align-middle" data-feather="settings"></i>
+                            </a>
+                            <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#"
+                                data-bs-toggle="dropdown">
+                                <img src="img/avatars/avatar.jpg" class="avatar img-fluid rounded me-1"
+                                    alt="Charles Hall" /> <span class="text-dark">Charles Hall</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="pages-profile.html"><i class="align-middle me-1"
+                                        data-feather="user"></i> Profile</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Log out</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main class="content">
+                <div class="container-fluid p-0">
+                    <div class="row">
+                        <div class="col-12 col-lg-6">
+                            <div class="mb-3">
+                                <h1 class="h3 d-inline align-middle">Pengajuan Cuti</h1>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Tipe Cuti<span
+                                                    class="text-danger">*</span></label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <select class="form-select mb-3">
+                                                <option selected>Pilih tipe cuti</option>
+                                                <option>Cuti tahunan</option>
+                                                <option>Cuti kedukaan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Tanggal<span class="text-danger">*</span></label>
+                                        </div>
+                                        <div class="col-md-9" id="tanggal-container">
+                                            <input type="date" class="form-control mb-2" name="tanggal[]"
+                                                onchange="handleTanggalChange(this)">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 row">
+                                        <label for="fotoLampiran" class="col-md-3 col-form-label">Lampiran</label>
+                                        <div class="col-md-9">
+                                            <input class="form-control" type="file" id="fotoLampiran" accept="image/*">
+                                            <small class="text-muted">Hanya gambar (JPG, PNG). Maksimal 2MB.</small>
+                                            <img id="previewFoto" class="img-thumbnail mt-2"
+                                                style="max-width: 200px; display: none;" />
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Alasan</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <textarea class="form-control" rows="2"
+                                                placeholder="Tambahkan catatan jika perlu"></textarea>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary btn-lg w-100">Ajukan Cuti</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+
+                            <div class="mb-3">
+                                <h1 class="h3 d-inline align-middle">Riwayat Cuti</h1>
+                            </div>
+
+                            <div class="card flex-fill">
+                                <div class="card-body">
+
+                                    <table id="projectTable" class="table table-hover my-0">
+                                        <thead>
+                                            <tr>
+                                            <tr>
+                                                <th>Diajukan pada</th>
+                                                <th>Tipe Cuti</th>
+                                                <th>Tanggal Cuti</th>
+                                                <th>Status</th>
+                                            </tr>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>04 Apr 2025</td>
+                                                <td>Cuti Tahunan</td>
+                                                <td>11 Apr 2025, 13 Apr 2025, 16 Apr 2025</td>
+                                                <td><span class="badge bg-success">Disetujui</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>02 Apr 2025</td>
+                                                <td>Cuti Tahunan</td>
+                                                <td>04 Apr 2025</td>
+                                                <td><span class="badge bg-danger">Ditolak</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="row text-muted">
+                        <div class="col-6 text-start">
+                            <p class="mb-0">
+                                <a class="text-muted" href="https://adminkit.io/"
+                                    target="_blank"><strong>AdminKit</strong></a> &copy;
+                            </p>
+                        </div>
+                        <div class="col-6 text-end">
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Support</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Help Center</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Privacy</a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Terms</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+
+    <script>
+        function handleTanggalChange(input) {
+            const container = document.getElementById("tanggal-container");
+            const inputs = container.querySelectorAll('input[type="date"]');
+
+            // Jika input dikosongkan dan masih ada lebih dari satu input, hapus input tersebut
+            if (input.value === "") {
+                if (inputs.length > 1) {
+                    container.removeChild(input);
+                }
+                return; // Tidak perlu lanjutkan ke penambahan input baru
+            }
+
+            // Jika input terakhir diisi, tambahkan input baru
+            const lastInput = inputs[inputs.length - 1];
+            if (input === lastInput) {
+                const newInput = document.createElement("input");
+                newInput.type = "date";
+                newInput.name = "tanggal[]";
+                newInput.className = "form-control mb-2";
+                newInput.onchange = function () {
+                    handleTanggalChange(newInput);
+                };
+                container.appendChild(newInput);
+            }
+        }
+    </script>
+
+    <script>
+        document.getElementById('fotoLampiran').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('previewFoto');
+
+            if (file) {
+                if (file.size > 2 * 1024 * 1024) { // 2MB dalam bytes
+                    alert('Ukuran file maksimal 2MB!');
+                    this.value = ''; // reset input
+                    preview.style.display = 'none';
+                    preview.src = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+
+</body>
+
+</html>

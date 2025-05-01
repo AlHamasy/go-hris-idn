@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Absensi - HRIS IDN</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/app.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="wrapper">
+        <nav id="sidebar" class="sidebar js-sidebar">
+            <div class="sidebar-content js-simplebar">
+                <a class="sidebar-brand" href="index.html">
+                    <span class="align-middle">HRIS IDN</span>
+                </a>
+
+                <ul class="sidebar-nav">
+                    <li class="sidebar-header">
+                        Menu
+                    </li>
+
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="index.html">
+                            <i class="align-middle" data-feather="home"></i> <span class="align-middle">Home</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item active">
+                        <a class="sidebar-link" href="attendance.html">
+                            <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Absensi</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="leave.html">
+                            <i class="align-middle" data-feather="coffee"></i> <span class="align-middle">Cuti</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="payroll.html">
+                            <i class="align-middle" data-feather="dollar-sign"></i> <span
+                                class="align-middle">Penghasilan</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="main">
+            <nav class="navbar navbar-expand navbar-light navbar-bg">
+                <a class="sidebar-toggle js-sidebar-toggle">
+                    <i class="hamburger align-self-center"></i>
+                </a>
+
+                <div class="navbar-collapse collapse">
+                    <ul class="navbar-nav navbar-align">
+                        <li class="nav-item dropdown">
+                            <a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#"
+                                data-bs-toggle="dropdown">
+                                <i class="align-middle" data-feather="settings"></i>
+                            </a>
+                            <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#"
+                                data-bs-toggle="dropdown">
+                                <img src="img/avatars/avatar.jpg" class="avatar img-fluid rounded me-1"
+                                    alt="Charles Hall" /> <span class="text-dark">Charles Hall</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="pages-profile.html"><i class="align-middle me-1"
+                                        data-feather="user"></i> Profile</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Log out</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Modal Kamera -->
+            <div class="modal fade" id="cameraModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Ambil Foto</h5>
+                        </div>
+                        <div class="modal-body text-center">
+                            <video id="webcam" autoplay playsinline width="100%" class="rounded"
+                                style="transform: scaleX(-1);"></video>
+                            <canvas id="snapshot" class="d-none"></canvas>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="captureBtn" class="btn btn-primary">Capture</button>
+                            <button id="cancelBtn" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <main class="content">
+                <div class="container-fluid p-0">
+                    <div class="row">
+                        <div class="col-12 col-lg-6">
+                            <div class="mb-3">
+                                <h1 class="h3 d-inline align-middle">Catat Kehadiran</h1>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <!-- Label Kiri -->
+                                        <div class="col-md-3">
+                                            <label class="form-label">Foto<span class="text-danger">*</span></label>
+                                        </div>
+                                        <!-- Gambar Kanan -->
+                                        <div class="col-md-9 text-center">
+                                            <img id="previewImage" src="https://placehold.co/150" class="img-thumbnail"
+                                                style="cursor: pointer; max-width: 200px;" alt="Klik untuk ambil foto">
+                                            <br>
+                                            <small class="text-muted">Klik gambar untuk buka kamera</small>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Lokasi<span class="text-danger">*</span></label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input id="latlong" type="text" class="form-control mb-2"
+                                                placeholder="Koordinat anda akan tampil di sini" disabled>
+                                            <div class="text-end">
+                                                <button type="submit" class="btn btn-primary"
+                                                    onclick="getLocation()">Get
+                                                    lokasi anda</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Kantor<span class="text-danger">*</span></label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <select class="form-select mb-3">
+                                                <option selected>Pilih kantor</option>
+                                                <option>Kantor IDN - Anggrek Rosliana</option>
+                                                <option>Rumah Belajar IDN - Palmerah</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Shift<span class="text-danger">*</span></label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <select class="form-select mb-3">
+                                                <option selected>Pilih shift</option>
+                                                <option>Shift Pagi (07:00 - 15:00)</option>
+                                                <option>Shift Siang (14:00 - 22:00)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Catatan</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <textarea class="form-control" rows="2"
+                                                placeholder="Tambahkan catatan jika perlu"></textarea>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary btn-lg w-100">Check In</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+
+                            <div class="mb-3">
+                                <h1 class="h3 d-inline align-middle">Riwayat Kehadiran</h1>
+                            </div>
+
+                            <div class="card flex-fill">
+                                <div class="card-body">
+                                    <select class="form-select mb-3">
+                                        <option selected>April 2025</option>
+                                        <option>Maret 2025</option>
+                                        <option>Februari 2025</option>
+                                        <option>Januari 2025</option>
+                                    </select>
+                                    <table id="projectTable" class="table table-hover my-0">
+                                        <thead>
+                                            <tr>
+                                            <tr>
+                                                <th>Tanggal</th>
+                                                <th class="d-none d-xl-table-cell">Check In</th>
+                                                <th class="d-none d-xl-table-cell">Check Out</th>
+                                                <th>Status</th>
+                                                <th class="d-none d-md-table-cell">Kantor</th>
+                                            </tr>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="d-none d-xl-table-cell">04 Apr 2025</td>
+                                                <td class="d-none d-xl-table-cell">08:54:00</td>
+                                                <td class="d-none d-xl-table-cell">16:03:00</td>
+                                                <td><span class="badge bg-danger">Terlambat</span></td>
+                                                <td class="d-none d-md-table-cell">Kantor IDN - Anggrek Rosliana</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="d-none d-xl-table-cell">04 Apr 2025</td>
+                                                <td class="d-none d-xl-table-cell">08:54:00</td>
+                                                <td class="d-none d-xl-table-cell">16:03:00</td>
+                                                <td><span class="badge bg-success">Tepat Waktu</span></td>
+                                                <td class="d-none d-md-table-cell">Rumah Belajar IDN - Palmerah</td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="col-6 text-start">
+                        <p class="mb-0">
+                            <a class="text-muted" href="https://idn.id"
+                                target="_blank"><strong>ID-Networkers</strong></a>
+                            &copy;
+                        </p>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+
+    <script>
+        const previewImage = document.getElementById('previewImage');
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('snapshot');
+        const captureBtn = document.getElementById('captureBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        let stream;
+
+        // Saat gambar diklik, buka kamera
+        previewImage.addEventListener('click', async () => {
+            const modal = new bootstrap.Modal(document.getElementById('cameraModal'));
+            modal.show();
+
+            // Minta akses webcam
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        });
+
+        // Capture dari video → convert ke gambar
+        captureBtn.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Flip balik (mirror balik) sebelum menggambar
+            context.save();
+            context.translate(canvas.width, 0);
+            context.scale(-1, 1); // Flip horizontal
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            context.restore();
+
+            // Ambil base64
+            const imageData = canvas.toDataURL('image/png');
+
+            // Set gambar hasil ke <img>
+            previewImage.src = imageData;
+
+            // Stop webcam
+            stream.getTracks().forEach(track => track.stop());
+
+            // Tutup modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('cameraModal'));
+            modal.hide();
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            // Stop webcam
+            stream.getTracks().forEach(track => track.stop());
+
+            // Tutup modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('cameraModal'));
+            modal.hide();
+        });
+
+    </script>
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation tidak didukung oleh browser ini.");
+            }
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const long = position.coords.longitude;
+            document.getElementById("latlong").value = `${lat},${long}`;
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Izin lokasi ditolak oleh pengguna.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Informasi lokasi tidak tersedia.");
+                    break;
+                case error.TIMEOUT:
+                    alert("Permintaan lokasi melebihi batas waktu.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("Terjadi kesalahan yang tidak diketahui.");
+                    break;
+            }
+        }
+    </script>
+
+
+
+</body>
+
+</html>
