@@ -127,8 +127,6 @@ func EditEmployee(w http.ResponseWriter, r *http.Request) {
 		IsAdmin:   isAdmin,
 	}
 
-	log.Print("Employee, ", employee)
-
 	errorMessages := employeeValidation.Struct(employee)
 
 	if errorMessages != nil {
