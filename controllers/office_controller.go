@@ -95,7 +95,7 @@ func EditOffice(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 
-		// Ambil data office berdasarkan UUID
+		// Ambil data office berdasarkan ID
 		office, err := officeModel.FindOfficeByID(int64Id)
 		if err != nil || id == "" {
 			http.Error(w, "ID tidak ditemukan", http.StatusBadRequest)

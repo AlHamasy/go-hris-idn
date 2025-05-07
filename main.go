@@ -12,18 +12,22 @@ func main() {
 
 	// home
 	http.HandleFunc("/home", controllers.Home)
+	http.HandleFunc("/home-admin", controllers.HomeAdmin)
 
 	// news
 	http.HandleFunc("/news", controllers.News)
 
 	// attendance
-	http.HandleFunc("/attendance", controllers.Attendance)
+	http.HandleFunc("/attendance-submit", controllers.SubmitAttendance)
+	http.HandleFunc("/attendance-list", controllers.ListAttendance)
 
 	// leave
-	http.HandleFunc("/leave", controllers.Leave)
+	http.HandleFunc("/leave-submit", controllers.SubmitLeave)
+	http.HandleFunc("/leave-list", controllers.ListLeave)
 
 	// payroll
-	http.HandleFunc("/payroll", controllers.Payroll)
+	http.HandleFunc("/payroll-self", controllers.MyPayroll)
+	http.HandleFunc("/payroll-list", controllers.ListPayroll)
 
 	// employee
 	http.HandleFunc("/employee", controllers.Employee)
