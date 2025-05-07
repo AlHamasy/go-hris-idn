@@ -175,6 +175,7 @@
                                                 <th>No.HP</th>
                                                 <th>Gender</th>
                                                 <th>Tgl Lahir</th>
+                                                <th>Admin?</th>
                                                 <th>Foto</th>
                                                 <th>Aksi</th>
                                             </tr>
@@ -187,10 +188,17 @@
                                                 <td>{{ .Email }}</td>
                                                 <td>{{ .Phone }}</td>
                                                 <td>
-                                                    {{ if eq .Gender "M" }}Laki-laki{{ else if eq .Gender "F"
-                                                    }}Perempuan{{ else }}-{{ end }}
+                                                    {{ if eq .Gender "M" }}Laki-laki {{ else if eq .Gender "F"
+                                                    }} Perempuan {{ else }} - {{ end }}
                                                 </td>
                                                 <td>{{ .BirthDate }}</td>
+                                                <td>
+                                                    {{ if eq .IsAdmin true }}
+                                                    <span class="badge bg-success">Admin</span>
+                                                    {{ else }}
+                                                    <span class="badge bg-warning">Karyawan</span>
+                                                    {{ end }}
+                                                </td>
                                                 <td>
                                                     {{ if .Photo }}
                                                     <img src="data:image/jpeg;base64,{{ .Photo }}"

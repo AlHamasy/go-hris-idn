@@ -1,5 +1,7 @@
 package entities
 
+import "database/sql"
+
 type Employee struct {
 	UUID      string `validate:"required"`
 	Name      string `validate:"required" label:"Nama"`
@@ -24,4 +26,16 @@ type EditEmployee struct {
 	Gender    string `validate:"required,oneof=F M" label:"Jenis Kelamin"`
 	BirthDate string `validate:"required" label:"Tanggal Lahir"`
 	IsAdmin   bool   `validate:"-"`
+}
+
+type LoginEmployee struct {
+	Name      string
+	Email     string
+	Phone     string
+	NIK       string
+	Gender    string
+	BirthDate string
+	Photo     sql.NullString
+	Password  string
+	IsAdmin   bool
 }
