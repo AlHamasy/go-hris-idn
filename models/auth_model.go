@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"hris-idn/config"
 	"hris-idn/entities"
+	"hris-idn/helpers"
 	"log"
 )
 
@@ -21,8 +22,9 @@ func NewAuthModel() *AuthModel {
 	}
 }
 
-func (model AuthModel) FindByNIK(nik string) (entities.LoginEmployee, error) {
-	var employee entities.LoginEmployee
+func (model AuthModel) FindByNIK(nik string) (entities.Employee, error) {
+	var employee entities.Employee
+	var photo sql.NullString
 
 	query := `
 		SELECT name, email, phone, nik, gender, birth_date, photo, password, is_admin
@@ -36,10 +38,24 @@ func (model AuthModel) FindByNIK(nik string) (entities.LoginEmployee, error) {
 		&employee.NIK,
 		&employee.Gender,
 		&employee.BirthDate,
-		&employee.Photo,
+		&photo,
 		&employee.Password,
 		&employee.IsAdmin,
 	)
+
+	if err != nil {
+		return employee, err
+	}
+
+	if photo.Valid {
+		employee.Photo = photo.String
+	} else {
+		if employee.Gender == "M" {
+			employee.Photo = helpers.MALE_BASE64
+		} else if employee.Gender == "F" {
+			employee.Photo = helpers.FEMALE_BASE64
+		}
+	}
 
 	return employee, err
 }
