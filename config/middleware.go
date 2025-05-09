@@ -5,19 +5,6 @@ import (
 	"net/http"
 )
 
-// func AllowAll(next http.HandlerFunc) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		session, _ := Store.Get(r, SESSION_ID)
-// 		loggedIn, ok := session.Values["loggedIn"].(bool)
-// 		if !ok || !loggedIn {
-// 			redirectTo := url.QueryEscape(r.URL.Path)
-// 			http.Redirect(w, r, "/login?redirect="+redirectTo, http.StatusSeeOther)
-// 			return
-// 		}
-// 		next.ServeHTTP(w, r)
-// 	}
-// }
-
 func AdminOnly(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		session, _ := Store.Get(r, SESSION_ID)
@@ -61,18 +48,6 @@ func NonAdminOnly(next http.HandlerFunc) http.HandlerFunc {
 		next.ServeHTTP(w, r)
 	}
 }
-
-// // Middleware untuk user yang harus login
-// func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		session, _ := Store.Get(r, SESSION_ID)
-// 		if session.Values["loggedIn"] != true {
-// 			http.Redirect(w, r, "/login", http.StatusSeeOther)
-// 			return
-// 		}
-// 		next.ServeHTTP(w, r)
-// 	}
-// }
 
 // Middleware untuk guest (belum login)
 func GuestMiddleware(next http.HandlerFunc) http.HandlerFunc {
