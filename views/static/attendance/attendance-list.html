@@ -9,6 +9,7 @@
     <title>Kehadiran - HRIS IDN</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
     <link href="/static/css/app.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
@@ -143,7 +144,83 @@
 
             <main class="content">
                 <div class="container-fluid p-0">
-                    <h1 class="h3 d-inline align-middle">List Kehadiran</h1>
+
+                    <div class="row">
+                        <div class="col">
+                            <h1 class="h3 mb-3">List Karyawan</h1>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select mb-3" id="monthSelect" onchange="changeMonth(this)">
+                                {{range .months}}
+                                <option value="{{.}}" {{if eq . $.selectedMonth}}selected{{end}}>{{.}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 d-flex">
+                            <div class="card flex-fill">
+                                <div class="card-body">
+                                    <table id="projectTable" class="table table-hover my-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Tanggal</th>
+                                                <th>NIK</th>
+                                                <th>Nama</th>
+                                                <th>Check In</th>
+                                                <th>Check Out</th>
+                                                <th>Status Check In</th>
+                                                <th>Status Check Out</th>
+                                                <th>Kantor</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{range .attendances}}
+                                            <tr>
+                                                <td>{{.FormattedDate}}</td>
+                                                <td>{{.NIK}}</td>
+                                                <td>{{.EmployeeName}}</td>
+                                                <td>{{.CheckInTime.Format "15:04:05"}}</td>
+                                                <td>
+                                                    {{if .CheckOutTime.Valid}}
+                                                    {{.CheckOutTime.Time.Format "15:04:05"}}
+                                                    {{else}}
+                                                    -
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    {{if .IsLate}}
+                                                    <span class="badge bg-danger">Terlambat</span>
+                                                    {{else}}
+                                                    <span class="badge bg-success">Tepat Waktu</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    {{if .CheckOutTime.Valid}}
+                                                    {{if .IsEarly.Valid}}
+                                                    {{if .IsEarly.Bool}}
+                                                    <span class="badge bg-danger">Pulang Awal</span>
+                                                    {{else}}
+                                                    <span class="badge bg-success">Tepat Waktu</span>
+                                                    {{end}}
+                                                    {{else}}
+                                                    <span class="badge bg-secondary">Status Tidak Diketahui</span>
+                                                    {{end}}
+                                                    {{else}}
+                                                    <span class="badge bg-secondary">Belum Check Out</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>{{.OfficeName}}</td>
+                                            </tr>
+                                            {{end}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </main>
 
@@ -162,7 +239,30 @@
         </div>
     </div>
 
+
+    <!-- jQuery (required by DataTables)  -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
     <script src="/static/js/app.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#projectTable').DataTable({
+                ordering: false, // matikan fitur sorting
+                pageLength: 25
+            });
+        });
+    </script>
+
+
+    <script>
+        function changeMonth(select) {
+            window.location.href = '?month=' + encodeURIComponent(select.value);
+        }
+    </script>
 
 
 </body>

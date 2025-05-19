@@ -62,12 +62,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	session.Values["isAdmin"] = employee.IsAdmin
 	session.Save(r, w)
 
-	// // Jika ada redirect, pakai itu
-	// if redirectTo != "" {
-	// 	http.Redirect(w, r, redirectTo, http.StatusSeeOther)
-	// 	return
-	// }
-
 	if employee.IsAdmin {
 		http.Redirect(w, r, "/home-admin", http.StatusSeeOther)
 	} else {

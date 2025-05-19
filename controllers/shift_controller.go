@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 var shiftModel = models.NewShiftModel()
@@ -43,14 +44,17 @@ func AddShift(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var data = make(map[string]interface{})
+
 	r.ParseForm()
 
-	var data = make(map[string]interface{})
+	startTimeStr := r.Form.Get("start_time")
+	endTimeStr := r.Form.Get("end_time")
 
 	shift := entities.Shift{
 		Name:      r.Form.Get("name"),
-		StartTime: r.Form.Get("start_time"),
-		EndTime:   r.Form.Get("end_time"),
+		StartTime: startTimeStr,
+		EndTime:   endTimeStr,
 	}
 
 	errorMessages := shiftValidation.Struct(shift)
@@ -61,6 +65,13 @@ func AddShift(w http.ResponseWriter, r *http.Request) {
 		helpers.RenderTemplate(w, template, data)
 		return
 	}
+
+	layout := "15:04"
+	startTimeParsed, _ := time.Parse(layout, startTimeStr)
+	endTimeParsed, _ := time.Parse(layout, endTimeStr)
+
+	shift.StartTime = startTimeParsed.Format("15:04:05")
+	shift.EndTime = endTimeParsed.Format("15:04:05")
 
 	err := shiftModel.AddShift(shift)
 

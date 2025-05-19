@@ -7,6 +7,8 @@ import (
 	"hris-idn/helpers"
 	"log"
 	"time"
+
+	"github.com/goodsign/monday"
 )
 
 type EmployeeModel struct {
@@ -49,6 +51,7 @@ func (model EmployeeModel) FindAllEmployee() ([]entities.Employee, error) {
 	for rows.Next() {
 		var employee entities.Employee
 		var photo sql.NullString
+		var birthDateTime time.Time
 		err := rows.Scan(
 			&employee.UUID,
 			&employee.NIK,
@@ -58,11 +61,13 @@ func (model EmployeeModel) FindAllEmployee() ([]entities.Employee, error) {
 			&employee.Gender,
 			&employee.IsAdmin,
 			&photo,
-			&employee.BirthDate,
+			&birthDateTime,
 		)
 		if err != nil {
 			return []entities.Employee{}, err
 		}
+
+		employee.BirthDate = monday.Format(birthDateTime, "02 January 2006", monday.LocaleIdID)
 
 		if photo.Valid {
 			employee.Photo = photo.String

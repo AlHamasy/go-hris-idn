@@ -25,15 +25,3 @@ type EditEmployee struct {
 	BirthDate string `validate:"required" label:"Tanggal Lahir"`
 	IsAdmin   bool   `validate:"-"`
 }
-
-// type LoginEmployee struct {
-// 	Name      string
-// 	Email     string
-// 	Phone     string
-// 	NIK       string
-// 	Gender    string
-// 	BirthDate string
-// 	Photo     sql.NullString
-// 	Password  string
-// 	IsAdmin   bool
-// }

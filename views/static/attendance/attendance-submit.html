@@ -164,78 +164,159 @@
             <main class="content">
                 <div class="container-fluid p-0">
                     <div class="row">
-                        <div class="col-12 col-lg-6">
+                        <div class="col-12 col-lg-5">
                             <div class="mb-3">
                                 <h1 class="h3 d-inline align-middle">Catat Kehadiran</h1>
                             </div>
                             <div class="card">
                                 <div class="card-body">
-                                    <div class="row mb-3">
-                                        <!-- Label Kiri -->
-                                        <div class="col-md-3">
-                                            <label class="form-label">Foto<span class="text-danger">*</span></label>
-                                        </div>
-                                        <!-- Gambar Kanan -->
-                                        <div class="col-md-9 text-center">
-                                            <img id="previewImage" src="https://placehold.co/150" class="img-thumbnail"
-                                                style="cursor: pointer; max-width: 200px;" alt="Klik untuk ambil foto">
-                                            <br>
-                                            <small class="text-muted">Klik gambar untuk buka kamera</small>
-                                        </div>
+
+
+                                    {{ if .success }}
+                                    <div class="alert alert-success">
+                                        {{ .success }}
                                     </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-3">
-                                            <label class="form-label">Lokasi<span class="text-danger">*</span></label>
-                                        </div>
-                                        <div class="col-md-9">
-                                            <input id="latlong" type="text" class="form-control mb-2"
-                                                placeholder="Koordinat anda akan tampil di sini" disabled>
-                                            <div class="text-end">
-                                                <button type="submit" class="btn btn-primary"
-                                                    onclick="getLocation()">Get
-                                                    lokasi anda</button>
+                                    {{ end }}
+
+                                    {{ if .isLate }}
+                                    <div class="alert alert-warning">
+                                        {{ .isLate }}
+                                    </div>
+                                    {{ end }}
+
+                                    {{ if .isEarly }}
+                                    <div class="alert alert-warning">
+                                        {{ .isEarly }}
+                                    </div>
+                                    {{ end }}
+
+                                    {{ if .error }}
+                                    <div class="alert alert-danger">
+                                        {{ .error }}
+                                    </div>
+                                    {{ end }}
+
+                                    <form action="/attendance-submit" method="POST">
+
+                                        <div class="row mb-3">
+                                            <!-- Label Kiri -->
+                                            <div class="col-md-3">
+                                                <label class="form-label">Foto<span class="text-danger">*</span></label>
+                                            </div>
+                                            <!-- Gambar Kanan -->
+                                            <div class="col-md-9 text-center">
+                                                <input type="hidden" name="attendance_photo" id="attendancePhoto"
+                                                    value="{{ .attendance.Photo }}">
+                                                <img id="previewImage"
+                                                    src="{{ if .attendance.Photo }}data:image/png;base64,{{ .attendance.Photo }}{{ else }}https://placehold.co/150{{ end }}"
+                                                    class="img-thumbnail {{ if .validation.Photo }}is-invalid{{ end }}"
+                                                    style="cursor: pointer; max-width: 200px;"
+                                                    alt="Klik untuk ambil foto">
+                                                <br>
+                                                <small class="text-muted">Klik kotak diatas untuk buka kamera</small>
+                                                <div class="invalid-feedback">
+                                                    {{ .validation.Photo}}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <label class="form-label">Kantor<span class="text-danger">*</span></label>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Lokasi<span
+                                                        class="text-danger">*</span></label>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <input id="latlongInput" type="text" name="latlong"
+                                                    class="form-control mb-2 {{ if .validation.LatLongStr }}is-invalid{{ end }}"
+                                                    placeholder="Koordinat anda akan tampil di sini" readonly
+                                                    value="{{ .attendance.LatLongStr }}">
+                                                <div class="invalid-feedback">
+                                                    {{ .validation.LatLongStr}}
+                                                </div>
+                                                <div class="text-end">
+                                                    <button type="button" class="btn btn-primary"
+                                                        onclick="getLocation()">Get
+                                                        lokasi anda</button>
+                                                </div>
+                                                <input type="hidden" name="latitude" id="latitudeInput">
+                                                <input type="hidden" name="longitude" id="longitudeInput">
+
+                                            </div>
                                         </div>
-                                        <div class="col-md-9">
-                                            <select class="form-select mb-3">
-                                                <option selected>Pilih kantor</option>
-                                                <option>Kantor IDN - Anggrek Rosliana</option>
-                                                <option>Rumah Belajar IDN - Palmerah</option>
-                                            </select>
+
+                                        {{ if eq .status "not_checked_in" }}
+                                        <div class="row mb-3">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Kantor<span
+                                                        class="text-danger">*</span></label>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <select
+                                                    class="form-select {{ if .validation.OfficeIDStr }} is-invalid {{ end }}"
+                                                    name="office_id">
+                                                    <option value="">Pilih kantor</option>
+                                                    {{ range .office }}
+                                                    <option value="{{ .Id }}" {{ if eq $.attendance.OfficeIDStr
+                                                        (printf "%d" .Id) }}selected{{ end }}>{{ .Name }}</option>
+                                                    {{ end }}
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    {{ .validation.OfficeIDStr}}
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <label class="form-label">Shift<span class="text-danger">*</span></label>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Shift<span
+                                                        class="text-danger">*</span></label>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <select
+                                                    class="form-select {{ if .validation.ShiftIDStr }} is-invalid {{ end }}"
+                                                    name="shift_id">
+                                                    <option value="" selected>Pilih shift</option>
+                                                    {{ range .shift }}
+                                                    <option value="{{ .Id }}" {{ if eq $.attendance.ShiftIDStr
+                                                        (printf "%d" .Id) }}selected{{ end }}>{{ .Name }} ({{ .StartTime
+                                                        }} - {{
+                                                        .EndTime
+                                                        }})</option>
+                                                    {{ end }}
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    {{ .validation.ShiftIDStr}}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-md-9">
-                                            <select class="form-select mb-3">
-                                                <option selected>Pilih shift</option>
-                                                <option>Shift Pagi (07:00 - 15:00)</option>
-                                                <option>Shift Siang (14:00 - 22:00)</option>
-                                            </select>
+                                        {{ end }}
+
+                                        <div class="row mb-4">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Catatan</label>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <textarea class="form-control" rows="2"
+                                                    placeholder="Tambahkan catatan jika perlu"
+                                                    name="notes">{{ .attendance.Notes }}</textarea>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row mb-4">
-                                        <div class="col-md-3">
-                                            <label class="form-label">Catatan</label>
-                                        </div>
-                                        <div class="col-md-9">
-                                            <textarea class="form-control" rows="2"
-                                                placeholder="Tambahkan catatan jika perlu"></textarea>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-primary btn-lg w-100">Check In</button>
+
+                                        {{ if eq .status "not_checked_in" }}
+                                        <button class="btn btn-primary btn-lg w-100">Check In</button>
+                                        {{ else if eq .status "checked_in" }}
+                                        <button class="btn btn-warning btn-lg w-100">Check Out</button>
+                                        {{ else if eq .status "checked_out" }}
+                                        <p class="text-muted">You have completed today's attendance.</p>
+                                        {{ end }}
+
+                                    </form>
+
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-12 col-lg-6">
+                        <div class="col-12 col-lg-7">
 
                             <div class="mb-3">
                                 <h1 class="h3 d-inline align-middle">Riwayat Kehadiran</h1>
@@ -243,40 +324,66 @@
 
                             <div class="card flex-fill">
                                 <div class="card-body">
-                                    <select class="form-select mb-3">
-                                        <option selected>April 2025</option>
-                                        <option>Maret 2025</option>
-                                        <option>Februari 2025</option>
-                                        <option>Januari 2025</option>
+                                    {{ if .errorList }}
+                                    <div class="alert alert-danger">
+                                        {{ .errorList }}
+                                    </div>
+                                    {{ end }}
+                                    <select class="form-select mb-3" id="monthSelect" onchange="changeMonth(this)">
+                                        {{range .months}}
+                                        <option value="{{.}}" {{if eq . $.selectedMonth}}selected{{end}}>{{.}}</option>
+                                        {{end}}
                                     </select>
                                     <table id="projectTable" class="table table-hover my-0">
                                         <thead>
                                             <tr>
                                             <tr>
                                                 <th>Tanggal</th>
-                                                <th class="d-none d-xl-table-cell">Check In</th>
-                                                <th class="d-none d-xl-table-cell">Check Out</th>
-                                                <th>Status</th>
-                                                <th class="d-none d-md-table-cell">Kantor</th>
+                                                <th>Check In</th>
+                                                <th>Check Out</th>
+                                                <th>Status Check In</th>
+                                                <th>Status Check Out</th>
+                                                <th>Kantor</th>
                                             </tr>
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            {{range .attendances}}
                                             <tr>
-                                                <td class="d-none d-xl-table-cell">04 Apr 2025</td>
-                                                <td class="d-none d-xl-table-cell">08:54:00</td>
-                                                <td class="d-none d-xl-table-cell">16:03:00</td>
-                                                <td><span class="badge bg-danger">Terlambat</span></td>
-                                                <td class="d-none d-md-table-cell">Kantor IDN - Anggrek Rosliana</td>
+                                                <td>{{.FormattedDate}}</td>
+                                                <td>{{.CheckInTime.Format "15:04:05"}}</td>
+                                                <td>
+                                                    {{if .CheckOutTime.Valid}}
+                                                    {{.CheckOutTime.Time.Format "15:04:05"}}
+                                                    {{else}}
+                                                    -
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    {{if .IsLate}}
+                                                    <span class="badge bg-danger">Terlambat</span>
+                                                    {{else}}
+                                                    <span class="badge bg-success">Tepat Waktu</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    {{if .CheckOutTime.Valid}}
+                                                    {{if .IsEarly.Valid}}
+                                                    {{if .IsEarly.Bool}}
+                                                    <span class="badge bg-danger">Pulang Awal</span>
+                                                    {{else}}
+                                                    <span class="badge bg-success">Tepat Waktu</span>
+                                                    {{end}}
+                                                    {{else}}
+                                                    <span class="badge bg-secondary">Status Tidak Diketahui</span>
+                                                    {{end}}
+                                                    {{else}}
+                                                    <span class="badge bg-secondary">Belum Check Out</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>{{.OfficeName}}</td>
                                             </tr>
-                                            <tr>
-                                                <td class="d-none d-xl-table-cell">04 Apr 2025</td>
-                                                <td class="d-none d-xl-table-cell">08:54:00</td>
-                                                <td class="d-none d-xl-table-cell">16:03:00</td>
-                                                <td><span class="badge bg-success">Tepat Waktu</span></td>
-                                                <td class="d-none d-md-table-cell">Rumah Belajar IDN - Palmerah</td>
-                                            </tr>
-
+                                            {{end}}
                                         </tbody>
                                     </table>
                                 </div>
@@ -340,6 +447,9 @@
             // Set gambar hasil ke <img>
             previewImage.src = imageData;
 
+            // Simpan ke input hidden → hanya base64
+            document.getElementById('attendancePhoto').value = imageData.split(',')[1];
+
             // Stop webcam
             stream.getTracks().forEach(track => track.stop());
 
@@ -362,7 +472,11 @@
     <script>
         function getLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
+                navigator.geolocation.getCurrentPosition(showPosition, showError, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                });
             } else {
                 alert("Geolocation tidak didukung oleh browser ini.");
             }
@@ -371,7 +485,9 @@
         function showPosition(position) {
             const lat = position.coords.latitude;
             const long = position.coords.longitude;
-            document.getElementById("latlong").value = `${lat},${long}`;
+            document.getElementById("latlongInput").value = `${lat},${long}`;
+            document.getElementById("latitudeInput").value = lat;
+            document.getElementById("longitudeInput").value = long;
         }
 
         function showError(error) {
@@ -390,9 +506,22 @@
                     break;
             }
         }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const lat = document.getElementById("latitudeInput").value;
+            const long = document.getElementById("longitudeInput").value;
+
+            if (lat && long) {
+                document.getElementById("latlong").value = `${lat},${long}`;
+            }
+        });
     </script>
 
-
+    <script>
+        function changeMonth(select) {
+            window.location.href = '?month=' + encodeURIComponent(select.value);
+        }
+    </script>
 
 </body>
 

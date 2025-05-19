@@ -7,15 +7,15 @@ import (
 
 func AdminOnly(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		session, _ := Store.Get(r, SESSION_ID)
-		loggedIn, ok := session.Values["loggedIn"].(bool)
-		if !ok || !loggedIn {
+		if session.Values["loggedIn"] != true {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 
-		isAdmin, ok := session.Values["isAdmin"].(bool)
-		if !ok || !isAdmin {
+		isAdmin := session.Values["isAdmin"]
+		if isAdmin == false {
 			data := map[string]interface{}{
 				"isAdmin": isAdmin,
 			}
@@ -29,15 +29,15 @@ func AdminOnly(next http.HandlerFunc) http.HandlerFunc {
 
 func NonAdminOnly(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		session, _ := Store.Get(r, SESSION_ID)
-		loggedIn, ok := session.Values["loggedIn"].(bool)
-		if !ok || !loggedIn {
+		if session.Values["loggedIn"] != true {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 
-		isAdmin, ok := session.Values["isAdmin"].(bool)
-		if ok && isAdmin {
+		isAdmin := session.Values["isAdmin"]
+		if isAdmin == true {
 			data := map[string]interface{}{
 				"isAdmin": isAdmin,
 			}
