@@ -200,8 +200,8 @@
                                                     {{ end }}
                                                 </td>
                                                 <td>
-                                                    {{ if .Photo }}
-                                                    <img src="data:image/jpeg;base64,{{ .Photo }}"
+                                                    {{ if .Photo.Valid }}
+                                                    <img src="data:image/jpeg;base64,{{ .Photo.String }}"
                                                         alt="Foto {{ .Name }}" class="img-thumbnail"
                                                         style="height: 60px; width: 60px; object-fit: cover;">
                                                     {{ else }}

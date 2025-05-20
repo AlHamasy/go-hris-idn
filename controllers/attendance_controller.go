@@ -135,14 +135,10 @@ func actionCheckIn(w http.ResponseWriter, r *http.Request, sessionNIK string, da
 	shiftStartFull := fmt.Sprintf("%s %s", dateToday, findShift.StartTime)
 	shiftEndFull := fmt.Sprintf("%s %s", dateToday, findShift.EndTime)
 
-	// JANGAN DIHAPUS
 	// Gunakan ParseInLocation dengan timezone Asia/Jakarta
-	// loc, _ := time.LoadLocation("Asia/Jakarta")
-	// shiftStartTime, _ := time.ParseInLocation(layoutTime, shiftStartFull, loc)
-	// shiftEndTime, _ := time.ParseInLocation(layoutTime, shiftEndFull, loc)
-
-	shiftStartTime, _ := time.Parse(layoutTime, shiftStartFull)
-	shiftEndTime, _ := time.Parse(layoutTime, shiftEndFull)
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+	shiftStartTime, _ := time.ParseInLocation(layoutTime, shiftStartFull, loc)
+	shiftEndTime, _ := time.ParseInLocation(layoutTime, shiftEndFull, loc)
 
 	if now.After(shiftEndTime) {
 		data["error"] = "Shift yang anda pilih sudah selesai"
@@ -178,7 +174,6 @@ func actionCheckIn(w http.ResponseWriter, r *http.Request, sessionNIK string, da
 	}
 
 	helpers.RenderTemplate(w, template, data)
-
 }
 
 func actionCheckOut(w http.ResponseWriter, r *http.Request, sessionNIK string, data map[string]interface{}, template string, selectedMonth string) {
@@ -223,9 +218,8 @@ func actionCheckOut(w http.ResponseWriter, r *http.Request, sessionNIK string, d
 	dateToday := now.Format("2006-01-02")
 	shiftEndFull := fmt.Sprintf("%s %s", dateToday, findShift.EndTime)
 
-	// loc, _ := time.LoadLocation("Asia/Jakarta")
-	// shiftEndTime, _ := time.ParseInLocation(layoutTime, shiftEndFull, loc)
-	shiftEndTime, _ := time.Parse(layoutTime, shiftEndFull)
+	loc, _ := time.LoadLocation("Asia/Jakarta")
+	shiftEndTime, _ := time.ParseInLocation(layoutTime, shiftEndFull, loc)
 
 	isEarly := now.Before(shiftEndTime)
 

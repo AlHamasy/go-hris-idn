@@ -26,39 +26,6 @@ func NewAttendanceModel() *AttendanceModel {
 	}
 }
 
-func (model AttendanceModel) GetLastAttendance2(nik string) (*entities.Attendance, error) {
-	loc, err := time.LoadLocation("Asia/Jakarta")
-	if err != nil {
-		loc = time.UTC
-	}
-
-	now := time.Now().In(loc)
-	startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc)
-	endOfDay := startOfDay.Add(24 * time.Hour)
-
-	// Konversi ke UTC karena data di DB biasanya disimpan dalam UTC
-	startUTC := startOfDay.UTC()
-	endUTC := endOfDay.UTC()
-
-	row := model.db.QueryRow(`
-        SELECT id, nik, checkin_time, checkout_time
-        FROM attendance
-        WHERE nik = ? 
-          AND checkin_time BETWEEN ? AND ?
-          AND deleted_at IS NULL
-        ORDER BY checkin_time DESC LIMIT 1`, nik, startUTC, endUTC)
-
-	var att entities.Attendance
-	err = row.Scan(&att.ID, &att.NIK, &att.CheckInTime, &att.CheckOutTime)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, err
-	}
-	return &att, nil
-}
-
 func (model AttendanceModel) GetLastAttendance(nik string) string {
 	row := model.db.QueryRow(`
         SELECT id, nik, checkin_time, checkout_time

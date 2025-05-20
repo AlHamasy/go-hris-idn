@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"hris-idn/config"
 	"hris-idn/entities"
-	"hris-idn/helpers"
 	"log"
 )
 
@@ -47,15 +46,15 @@ func (model AuthModel) FindByNIK(nik string) (entities.Employee, error) {
 		return employee, err
 	}
 
-	if photo.Valid {
-		employee.Photo = photo.String
-	} else {
-		if employee.Gender == "M" {
-			employee.Photo = helpers.MALE_BASE64
-		} else if employee.Gender == "F" {
-			employee.Photo = helpers.FEMALE_BASE64
-		}
-	}
+	// if photo.Valid {
+	// 	employee.Photo = photo.String
+	// } else {
+	// 	if employee.Gender == "M" {
+	// 		employee.Photo = helpers.MALE_BASE64
+	// 	} else if employee.Gender == "F" {
+	// 		employee.Photo = helpers.FEMALE_BASE64
+	// 	}
+	// }
 
 	return employee, err
 }

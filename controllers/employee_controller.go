@@ -55,7 +55,8 @@ func AddEmployee(w http.ResponseWriter, r *http.Request) {
 		NIK:       r.Form.Get("nik"),
 		Gender:    r.Form.Get("gender"),
 		BirthDate: r.Form.Get("birth_date"),
-		IsAdmin:   isAdmin,
+		//Photo:     r.Form.Get("photo-base64"),
+		IsAdmin: isAdmin,
 	}
 
 	errorMessages := employeeValidation.Struct(employee)

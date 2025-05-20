@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"hris-idn/config"
 	"hris-idn/entities"
-	"hris-idn/helpers"
 	"log"
 	"time"
 
@@ -50,7 +49,7 @@ func (model EmployeeModel) FindAllEmployee() ([]entities.Employee, error) {
 
 	for rows.Next() {
 		var employee entities.Employee
-		var photo sql.NullString
+		//var photo sql.NullString
 		var birthDateTime time.Time
 		err := rows.Scan(
 			&employee.UUID,
@@ -60,7 +59,7 @@ func (model EmployeeModel) FindAllEmployee() ([]entities.Employee, error) {
 			&employee.Phone,
 			&employee.Gender,
 			&employee.IsAdmin,
-			&photo,
+			&employee.Photo,
 			&birthDateTime,
 		)
 		if err != nil {
@@ -69,15 +68,15 @@ func (model EmployeeModel) FindAllEmployee() ([]entities.Employee, error) {
 
 		employee.BirthDate = monday.Format(birthDateTime, "02 January 2006", monday.LocaleIdID)
 
-		if photo.Valid {
-			employee.Photo = photo.String
-		} else {
-			if employee.Gender == "M" {
-				employee.Photo = helpers.MALE_BASE64
-			} else if employee.Gender == "F" {
-				employee.Photo = helpers.FEMALE_BASE64
-			}
-		}
+		// if photo.Valid {
+		// 	employee.Photo = photo.String
+		// } else {
+		// 	if employee.Gender == "M" {
+		// 		employee.Photo = helpers.MALE_BASE64
+		// 	} else if employee.Gender == "F" {
+		// 		employee.Photo = helpers.FEMALE_BASE64
+		// 	}
+		// }
 
 		employees = append(employees, employee)
 	}
