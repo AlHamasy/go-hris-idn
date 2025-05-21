@@ -100,6 +100,21 @@
                 </div>
             </div>
 
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Lampiran</label>
+                </div>
+                <div class="col-md-9">
+                    {{ if .leave.Attachment.Valid }}
+                    <img src="data:image/jpeg;base64,{{.leave.Attachment.String}}" alt="Foto Lampiran"
+                        class="img-thumbnail" style="height: 200px; width: 200px; object-fit: cover;">
+                    {{ else }}
+                    <img src="https://placehold.co/60x60" alt="Foto Kosong" class="img-thumbnail"
+                        style="height: 120px; width: 120px; object-fit: cover;">
+                    {{ end }}
+                </div>
+            </div>
+
             {{if eq .leave.Status 1}}
 
             <div class="row mb-3">

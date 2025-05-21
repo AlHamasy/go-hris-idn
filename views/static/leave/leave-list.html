@@ -176,6 +176,7 @@
                                                 <th>Tanggal Cuti</th>
                                                 <th>Alasan</th>
                                                 <th>Status</th>
+                                                <th>Lampiran</th>
                                                 <th>Ctt Admin</th>
                                                 <th>Diproses pada</th>
                                                 <th>Aksi</th>
@@ -203,6 +204,17 @@
                                                     <span class="badge bg-danger">Ditolak</span>
                                                     {{ else }}
                                                     <span class="badge bg-secondary">Tidak diketahui</span>
+                                                    {{ end }}
+                                                </td>
+                                                <td>
+                                                    {{ if .Attachment.Valid }}
+                                                    <img src="data:image/jpeg;base64,{{ .Attachment.String }}"
+                                                        alt="Foto {{ .Name }}" class="img-thumbnail"
+                                                        style="height: 60px; width: 60px; object-fit: cover;">
+                                                    {{ else }}
+                                                    <img src="https://placehold.co/60x60" alt="Foto Kosong"
+                                                        class="img-thumbnail"
+                                                        style="height: 60px; width: 60px; object-fit: cover;">
                                                     {{ end }}
                                                 </td>
                                                 <td>

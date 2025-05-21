@@ -29,7 +29,7 @@ type Leave struct {
 	LeaveTypeName string
 	NIK           string
 	LeaveDateJoin string
-	Attachment    string
+	Attachment    sql.NullString
 	Reason        string
 	Status        int64
 	ReasonStatus  sql.NullString
