@@ -9,6 +9,7 @@
     <title>Cuti - HRIS IDN</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
     <link href="/static/css/app.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
@@ -105,9 +106,7 @@
                                 class="align-middle">Penghasilan</span>
                         </a>
                     </li>
-
                 </ul>
-
             </div>
         </nav>
 
@@ -143,44 +142,134 @@
             <main class="content">
                 <div class="container-fluid p-0">
 
-                    <h1 class="h3 d-inline align-middle">List Cuti Karyawan</h1>
+                    <div class="row">
+                        <div class="col">
+                            <h1 class="h3 mb-3">List Pengajuan Cuti</h1>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select mb-3" id="monthSelect" onchange="changeMonth(this)">
+                                {{range .months}}
+                                <option value="{{.}}" {{if eq . $.selectedMonth}}selected{{end}}>{{.}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                    </div>
 
+                    <div class="row">
+                        <div class="col-12 d-flex">
+                            <div class="card flex-fill">
+                                <div class="card-body">
+
+                                    {{ if .errorList }}
+                                    <div class="alert alert-danger">
+                                        {{ .errorList }}
+                                    </div>
+                                    {{ end }}
+
+                                    <table id="projectTable" class="table table-hover my-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Diajukan pada</th>
+                                                <th>NIK</th>
+                                                <th>Nama</th>
+                                                <th>Tipe Cuti</th>
+                                                <th>Tanggal Cuti</th>
+                                                <th>Alasan</th>
+                                                <th>Status</th>
+                                                <th>Ctt Admin</th>
+                                                <th>Diproses pada</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{range .leaves}}
+                                            <tr>
+                                                <td>{{.CreatedAt.Format "02 Jan 2006"}}</td>
+                                                <td>{{.NIK}}</td>
+                                                <td>{{.Name}}</td>
+                                                <td>{{.LeaveTypeName}}</td>
+                                                <td>
+                                                    {{range .LeaveDate}}
+                                                    <div>{{.Format "02 Jan 2006"}}</div>
+                                                    {{end}}
+                                                </td>
+                                                <td>{{.Reason}}</td>
+                                                <td>
+                                                    {{ if eq .Status 1 }}
+                                                    <span class="badge bg-warning">Menunggu</span>
+                                                    {{ else if eq .Status 2 }}
+                                                    <span class="badge bg-success">Disetujui</span>
+                                                    {{ else if eq .Status 3 }}
+                                                    <span class="badge bg-danger">Ditolak</span>
+                                                    {{ else }}
+                                                    <span class="badge bg-secondary">Tidak diketahui</span>
+                                                    {{ end }}
+                                                </td>
+                                                <td>
+                                                    {{if .ReasonStatus.Valid}}
+                                                    {{.ReasonStatus.String}}
+                                                    {{else}}
+                                                    -
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    {{if .UpdatedAt.Valid}}
+                                                    {{.UpdatedAt.Time.Format "02 Jan 2006"}}
+                                                    {{else}}
+                                                    -
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    <a href="/leave/approval?id={{.Id}}"
+                                                        class="btn btn-primary btn-sm">Proses</a>
+                                                </td>
+                                            </tr>
+                                            {{end}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
 
             <footer class="footer">
                 <div class="container-fluid">
-                    <div class="row text-muted">
-                        <div class="col-6 text-start">
-                            <p class="mb-0">
-                                <a class="text-muted" href="https://adminkit.io/"
-                                    target="_blank"><strong>AdminKit</strong></a> &copy;
-                            </p>
-                        </div>
-                        <div class="col-6 text-end">
-                            <ul class="list-inline">
-                                <li class="list-inline-item">
-                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Support</a>
-                                </li>
-                                <li class="list-inline-item">
-                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Help Center</a>
-                                </li>
-                                <li class="list-inline-item">
-                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Privacy</a>
-                                </li>
-                                <li class="list-inline-item">
-                                    <a class="text-muted" href="https://adminkit.io/" target="_blank">Terms</a>
-                                </li>
-                            </ul>
-                        </div>
+                    <div class="col-6 text-start">
+                        <p class="mb-0">
+                            <a class="text-muted" href="https://idn.id"
+                                target="_blank"><strong>ID-Networkers</strong></a>
+                            &copy;
+                        </p>
                     </div>
                 </div>
             </footer>
         </div>
     </div>
 
+    <!-- jQuery (required by DataTables)  -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
     <script src="/static/js/app.js"></script>
 
+    <script>
+        $(document).ready(function () {
+            $('#projectTable').DataTable({
+                ordering: false, // matikan fitur sorting
+                pageLength: 25
+            });
+        });
+    </script>
+
+    <script>
+        function changeMonth(select) {
+            window.location.href = '?month=' + encodeURIComponent(select.value);
+        }
+    </script>
 
 </body>
 

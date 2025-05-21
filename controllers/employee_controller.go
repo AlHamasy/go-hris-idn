@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"hris-idn/entities"
 	"hris-idn/helpers"
 	"hris-idn/libraries"
@@ -106,6 +107,8 @@ func EditEmployee(w http.ResponseWriter, r *http.Request) {
 			helpers.RenderTemplate(w, template, data)
 			return
 		}
+
+		fmt.Println("employee", employee)
 
 		// Kirim data ke template
 		data["employee"] = employee

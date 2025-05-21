@@ -161,10 +161,14 @@ func (model AttendanceModel) GetAttendanceList(nik string, monthYear string) ([]
             a.is_late,
             a.is_early,
             o.name as office_name,
-			e.name as employee_name
+			e.name as employee_name,
+			s.name as shift_name,
+            s.start_time,
+            s.end_time
         FROM attendance a
         LEFT JOIN office o ON a.office_id = o.id
 		LEFT JOIN employee e ON a.nik = e.nik
+		LEFT JOIN shift s ON a.shift_id = s.id
         WHERE a.deleted_at IS NULL 
         AND MONTH(a.checkin_time) = ? 
         AND YEAR(a.checkin_time) = ?`
@@ -205,6 +209,9 @@ func (model AttendanceModel) GetAttendanceList(nik string, monthYear string) ([]
 			&att.IsEarly,
 			&att.OfficeName,
 			&att.EmployeeName,
+			&att.ShiftName,
+			&att.ShiftStartTime,
+			&att.ShiftEndTime,
 		)
 		if err != nil {
 			return nil, err

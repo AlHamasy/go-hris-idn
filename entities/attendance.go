@@ -25,21 +25,22 @@ type Attendance struct {
 	OfficeName        string
 	FormattedDate     string
 	EmployeeName      string
+	ShiftName         string
+	ShiftStartTime    string
+	ShiftEndTime      string
 }
 
 type CheckIn struct {
-	NIK         string
-	OfficeID    int64
-	ShiftID     int64
-	Time        time.Time
-	Latitude    float64
-	Longitude   float64
-	Notes       string
-	IsLate      bool
-	Photo       string `validate:"required" label:"Foto"`
-	LatLongStr  string `validate:"required" label:"Lokasi"`
-	OfficeIDStr string `validate:"required" label:"Kantor"`
-	ShiftIDStr  string `validate:"required" label:"Shift"`
+	NIK        string
+	OfficeID   string `validate:"required" label:"Kantor"`
+	ShiftID    string `validate:"required" label:"Kantor"`
+	Time       time.Time
+	Latitude   float64
+	Longitude  float64
+	Notes      string
+	IsLate     bool
+	Photo      string `validate:"required" label:"Foto"`
+	LatLongStr string `validate:"required" label:"Lokasi"`
 }
 
 type CheckOut struct {

@@ -89,20 +89,26 @@ func getAttendanceList(sessionNIK string, data map[string]interface{}, selectedM
 
 func actionCheckIn(w http.ResponseWriter, r *http.Request, sessionNIK string, data map[string]interface{}, template string, selectedMonth string) {
 
+	// format time
 	layoutTime := "2006-01-02 15:04:05"
 
+	// ambil semua inputan dari HTML
 	officeIDStr := r.FormValue("office_id")
 	shiftIDStr := r.FormValue("shift_id")
 	latLongStr := r.Form.Get("latlong")
+	photo := r.Form.Get("attendance_photo")
+	notes := r.Form.Get("notes")
+
 	checkIn := entities.CheckIn{
-		NIK:         sessionNIK,
-		Photo:       r.Form.Get("attendance_photo"),
-		LatLongStr:  latLongStr,
-		OfficeIDStr: officeIDStr,
-		ShiftIDStr:  shiftIDStr,
-		Notes:       r.Form.Get("notes"),
+		NIK:        sessionNIK,
+		Photo:      photo,
+		LatLongStr: latLongStr,
+		OfficeID:   officeIDStr,
+		ShiftID:    shiftIDStr,
+		Notes:      notes,
 	}
 
+	// validasi jika ada yang kosong
 	errorMessages := attendanceValidation.Struct(checkIn)
 
 	if errorMessages != nil {
@@ -148,19 +154,13 @@ func actionCheckIn(w http.ResponseWriter, r *http.Request, sessionNIK string, da
 
 	isLate := now.After(shiftStartTime)
 
-	attendance := entities.CheckIn{
-		NIK:       sessionNIK,
-		OfficeID:  officeID,
-		ShiftID:   shiftID,
-		Time:      now,
-		Latitude:  latitude,
-		Longitude: longitude,
-		IsLate:    isLate,
-		Notes:     r.Form.Get("notes"),
-		Photo:     r.Form.Get("attendance_photo"),
-	}
+	// tambahkan data ke struct, yang belum ada sebelumnya
+	checkIn.Time = now
+	checkIn.Latitude = latitude
+	checkIn.Longitude = longitude
+	checkIn.IsLate = isLate
 
-	errCheckIn := attendanceModel.CheckIn(attendance)
+	errCheckIn := attendanceModel.CheckIn(checkIn)
 	if errCheckIn != nil {
 		data["error"] = "Error " + errCheckIn.Error()
 	} else {
@@ -181,18 +181,21 @@ func actionCheckOut(w http.ResponseWriter, r *http.Request, sessionNIK string, d
 	layoutTime := "2006-01-02 15:04:05"
 
 	latLongStr := r.Form.Get("latlong")
-	checkIn := entities.CheckOut{
+	photo := r.Form.Get("attendance_photo")
+	notes := r.Form.Get("notes")
+
+	checkOut := entities.CheckOut{
 		NIK:        sessionNIK,
-		Photo:      r.Form.Get("attendance_photo"),
+		Photo:      photo,
 		LatLongStr: latLongStr,
-		Notes:      r.Form.Get("notes"),
+		Notes:      notes,
 	}
 
-	errorMessages := attendanceValidation.Struct(checkIn)
+	errorMessages := attendanceValidation.Struct(checkOut)
 
 	if errorMessages != nil {
 		data["validation"] = errorMessages
-		data["attendance"] = checkIn
+		data["attendance"] = checkOut
 		helpers.RenderTemplate(w, template, data)
 		return
 	}
@@ -223,18 +226,14 @@ func actionCheckOut(w http.ResponseWriter, r *http.Request, sessionNIK string, d
 
 	isEarly := now.Before(shiftEndTime)
 
-	attendance := entities.CheckOut{
-		Time:      now,
-		Latitude:  latitude,
-		Longitude: longitude,
-		IsEarly:   isEarly,
-		Notes:     r.Form.Get("notes"),
-		Photo:     r.Form.Get("attendance_photo"),
-	}
+	checkOut.Time = now
+	checkOut.Latitude = latitude
+	checkOut.Longitude = longitude
+	checkOut.IsEarly = isEarly
 
-	errCheckIn := attendanceModel.CheckOut(sessionNIK, attendance)
-	if errCheckIn != nil {
-		data["error"] = "Error " + errCheckIn.Error()
+	errCheckOut := attendanceModel.CheckOut(sessionNIK, checkOut)
+	if errCheckOut != nil {
+		data["error"] = "Error " + errCheckOut.Error()
 	} else {
 		if isEarly {
 			data["isEarly"] = "Berhasil check out, namun anda pulang lebih awal"

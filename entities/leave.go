@@ -21,8 +21,6 @@ type SubmitLeave struct {
 	LeaveTypeId   string `validate:"required" label:"Tipe Cuti"`
 	Status        int64
 	ReasonStatus  sql.NullString
-	CreatedAt     time.Time
-	UpdatedAt     sql.NullTime
 }
 
 type Leave struct {
@@ -37,4 +35,13 @@ type Leave struct {
 	ReasonStatus  sql.NullString
 	CreatedAt     time.Time
 	UpdatedAt     sql.NullTime
+	LeaveDate     []time.Time
+	Name          string
+}
+
+type ApprovalLeave struct {
+	Id           int64
+	Status       int64  `validate:"required"`
+	ReasonStatus string `validate:"required" label:"Catatan"`
+	UpdatedAt    time.Time
 }

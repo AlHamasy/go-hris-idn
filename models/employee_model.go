@@ -49,7 +49,6 @@ func (model EmployeeModel) FindAllEmployee() ([]entities.Employee, error) {
 
 	for rows.Next() {
 		var employee entities.Employee
-		//var photo sql.NullString
 		var birthDateTime time.Time
 		err := rows.Scan(
 			&employee.UUID,
@@ -68,16 +67,6 @@ func (model EmployeeModel) FindAllEmployee() ([]entities.Employee, error) {
 
 		employee.BirthDate = monday.Format(birthDateTime, "02 January 2006", monday.LocaleIdID)
 
-		// if photo.Valid {
-		// 	employee.Photo = photo.String
-		// } else {
-		// 	if employee.Gender == "M" {
-		// 		employee.Photo = helpers.MALE_BASE64
-		// 	} else if employee.Gender == "F" {
-		// 		employee.Photo = helpers.FEMALE_BASE64
-		// 	}
-		// }
-
 		employees = append(employees, employee)
 	}
 
@@ -86,8 +75,10 @@ func (model EmployeeModel) FindAllEmployee() ([]entities.Employee, error) {
 
 func (model EmployeeModel) FindEmployeeByUUID(uuid string) (entities.Employee, error) {
 	var employee entities.Employee
+	var birthDate time.Time
 
 	query := "SELECT uuid, nik, name, email, phone, gender, is_admin, address, birth_date FROM employee WHERE uuid = ?"
+
 	err := model.db.QueryRow(query, uuid).Scan(
 		&employee.UUID,
 		&employee.NIK,
@@ -97,12 +88,14 @@ func (model EmployeeModel) FindEmployeeByUUID(uuid string) (entities.Employee, e
 		&employee.Gender,
 		&employee.IsAdmin,
 		&employee.Address,
-		&employee.BirthDate,
+		&birthDate,
 	)
 
 	if err != nil {
 		return employee, err
 	}
+
+	employee.BirthDate = birthDate.Format("2006-01-02")
 
 	return employee, nil
 }

@@ -240,7 +240,6 @@
                                                 </div>
                                                 <input type="hidden" name="latitude" id="latitudeInput">
                                                 <input type="hidden" name="longitude" id="longitudeInput">
-
                                             </div>
                                         </div>
 
@@ -252,16 +251,16 @@
                                             </div>
                                             <div class="col-md-9">
                                                 <select
-                                                    class="form-select {{ if .validation.OfficeIDStr }} is-invalid {{ end }}"
+                                                    class="form-select {{ if .validation.OfficeID }} is-invalid {{ end }}"
                                                     name="office_id">
                                                     <option value="">Pilih kantor</option>
                                                     {{ range .office }}
-                                                    <option value="{{ .Id }}" {{ if eq $.attendance.OfficeIDStr
+                                                    <option value="{{ .Id }}" {{ if eq $.attendance.OfficeID
                                                         (printf "%d" .Id) }}selected{{ end }}>{{ .Name }}</option>
                                                     {{ end }}
                                                 </select>
                                                 <div class="invalid-feedback">
-                                                    {{ .validation.OfficeIDStr}}
+                                                    {{ .validation.OfficeID}}
                                                 </div>
                                             </div>
                                         </div>
@@ -273,19 +272,19 @@
                                             </div>
                                             <div class="col-md-9">
                                                 <select
-                                                    class="form-select {{ if .validation.ShiftIDStr }} is-invalid {{ end }}"
+                                                    class="form-select {{ if .validation.ShiftID }} is-invalid {{ end }}"
                                                     name="shift_id">
                                                     <option value="" selected>Pilih shift</option>
                                                     {{ range .shift }}
-                                                    <option value="{{ .Id }}" {{ if eq $.attendance.ShiftIDStr
-                                                        (printf "%d" .Id) }}selected{{ end }}>{{ .Name }} ({{ .StartTime
+                                                    <option value="{{ .Id }}" {{ if eq $.attendance.ShiftID (printf "%d"
+                                                        .Id) }}selected{{ end }}>{{ .Name }} ({{ .StartTime
                                                         }} - {{
                                                         .EndTime
                                                         }})</option>
                                                     {{ end }}
                                                 </select>
                                                 <div class="invalid-feedback">
-                                                    {{ .validation.ShiftIDStr}}
+                                                    {{ .validation.ShiftID}}
                                                 </div>
                                             </div>
                                         </div>

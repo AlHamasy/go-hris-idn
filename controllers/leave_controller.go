@@ -8,7 +8,9 @@ import (
 	"hris-idn/models"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 )
 
 var leaveModel = models.NewLeaveModel()
@@ -26,12 +28,7 @@ func SubmitLeave(w http.ResponseWriter, r *http.Request) {
 	leaveType, _ := leaveModel.FindAllLeaveType()
 	data["leaveType"] = leaveType
 
-	leaveList, err := leaveModel.GetLeaveList(sessionNIK, "")
-	if err != nil {
-		log.Println("Error getting leave list:", err)
-		data["errorList"] = "Failed to get leave list"
-	}
-	data["leaves"] = leaveList
+	getLeaveList(data, sessionNIK)
 
 	if r.Method == http.MethodGet {
 		helpers.RenderTemplate(w, template, data)
@@ -66,9 +63,19 @@ func SubmitLeave(w http.ResponseWriter, r *http.Request) {
 		data["error"] = "Error " + errSubmit.Error()
 	} else {
 		data["success"] = "Pengajuan cuti berhasil, silahkan tunggu persetujuan dari Admin"
+		getLeaveList(data, sessionNIK)
 	}
 
 	helpers.RenderTemplate(w, template, data)
+}
+
+func getLeaveList(data map[string]interface{}, sessionNIK string) {
+	leaveList, err := leaveModel.GetLeaveList(sessionNIK, "")
+	if err != nil {
+		log.Println("Error getting leave list:", err)
+		data["errorList"] = "Failed to get leave list"
+	}
+	data["leaves"] = leaveList
 }
 
 func cleanLeaveDates(input []string) []string {
@@ -86,5 +93,94 @@ func ListLeave(w http.ResponseWriter, r *http.Request) {
 
 	template := "views/static/leave/leave-list.html"
 
-	helpers.RenderTemplate(w, template, nil)
+	data := make(map[string]interface{})
+
+	// Hitung 5 bulan terakhir
+	currentDate := time.Now()
+	var months []string
+	for i := 0; i < 5; i++ {
+		previousMonth := currentDate.AddDate(0, -i, 0)
+		months = append(months, previousMonth.Format("January 2006"))
+	}
+	data["months"] = months
+
+	// Get selected month from query parameter or use current month
+	selectedMonth := r.URL.Query().Get("month")
+	if selectedMonth == "" {
+		selectedMonth = currentDate.Format("January 2006")
+	}
+
+	// tampilkan list kehadiran
+	leaveList, err := leaveModel.GetLeaveList("", selectedMonth)
+	if err != nil {
+		log.Println("Error getting leave list:", err)
+		data["errorList"] = "Failed to get leave list"
+	}
+
+	data["leaves"] = leaveList
+	data["selectedMonth"] = selectedMonth
+
+	if r.Method == http.MethodGet {
+		helpers.RenderTemplate(w, template, data)
+		return
+	}
+}
+
+func ApprovalLeave(w http.ResponseWriter, r *http.Request) {
+
+	template := "views/static/leave/leave-approval.html"
+
+	idStr := r.URL.Query().Get("id")
+	id, _ := strconv.ParseInt(idStr, 10, 64)
+
+	var data = make(map[string]interface{})
+
+	getLeave(id, w, data)
+
+	if r.Method == http.MethodGet {
+		helpers.RenderTemplate(w, template, data)
+		return
+	}
+
+	r.ParseForm()
+
+	status := r.Form.Get("status")
+	reason := r.Form.Get("reason_status")
+
+	idInt64, _ := strconv.ParseInt(idStr, 10, 64)
+	statusInt64, _ := strconv.ParseInt(status, 10, 64)
+	approval := entities.ApprovalLeave{
+		Id:           idInt64,
+		Status:       statusInt64,
+		ReasonStatus: reason,
+		UpdatedAt:    time.Now(),
+	}
+
+	errorValidation := leaveValidation.Struct(approval)
+
+	if errorValidation != nil {
+		data["validation"] = errorValidation
+		data["approval"] = approval
+		helpers.RenderTemplate(w, template, data)
+		return
+	}
+
+	errApprove := leaveModel.UpdateLeaveStatus(approval)
+	if errApprove != nil {
+		data["error"] = "Gagal memproses cuti " + errApprove.Error()
+	} else {
+		data["success"] = "Cuti berhasil diproses"
+		getLeave(id, w, data)
+	}
+
+	helpers.RenderTemplate(w, template, data)
+}
+
+func getLeave(id int64, w http.ResponseWriter, data map[string]interface{}) {
+	leave, err := leaveModel.GetLeaveById(id)
+	if err != nil || leave == nil {
+		http.Error(w, "Data cuti tidak ditemukan", http.StatusBadRequest)
+		return
+	}
+	data["leave"] = leave
 }

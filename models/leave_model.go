@@ -84,9 +84,11 @@ func (model LeaveModel) GetLeaveList(nik string, monthYear string) ([]entities.L
 			le.status,
 			le.reason_status,
 			le.created_at,
-			le.updated_at
+			le.updated_at,
+			em.name
 		FROM leave_employee le
 		LEFT JOIN leave_type lt ON le.leave_type_id = lt.id
+		LEFT JOIN employee em ON le.nik = em.nik
 		WHERE le.deleted_at IS NULL
 	`
 
@@ -129,13 +131,100 @@ func (model LeaveModel) GetLeaveList(nik string, monthYear string) ([]entities.L
 			&leave.ReasonStatus,
 			&leave.CreatedAt,
 			&leave.UpdatedAt,
+			&leave.Name,
 		)
 		if err != nil {
 			return nil, err
+		}
+
+		// Parse LeaveDateJoin ke []time.Time
+		if leave.LeaveDateJoin != "" {
+			dateStrings := strings.Split(leave.LeaveDateJoin, ",")
+			for _, ds := range dateStrings {
+				parsedDate, err := time.Parse("2006-01-02", strings.TrimSpace(ds))
+				if err == nil {
+					leave.LeaveDate = append(leave.LeaveDate, parsedDate)
+				}
+			}
 		}
 
 		leaves = append(leaves, leave)
 	}
 
 	return leaves, nil
+}
+
+func (model LeaveModel) GetLeaveById(id int64) (*entities.Leave, error) {
+	query := `
+		SELECT 
+			le.id,
+			le.nik,
+			le.leave_type_id,
+			lt.name AS leave_type_name,
+			le.leave_date,
+			le.attachment,
+			le.reason,
+			le.status,
+			le.reason_status,
+			le.created_at,
+			le.updated_at,
+			em.name
+		FROM leave_employee le
+		LEFT JOIN leave_type lt ON le.leave_type_id = lt.id
+		LEFT JOIN employee em ON le.nik = em.nik
+		WHERE le.deleted_at IS NULL AND le.id = ?
+		LIMIT 1
+	`
+
+	var leave entities.Leave
+
+	err := model.db.QueryRow(query, id).Scan(
+		&leave.Id,
+		&leave.NIK,
+		&leave.LeaveTypeId,
+		&leave.LeaveTypeName,
+		&leave.LeaveDateJoin,
+		&leave.Attachment,
+		&leave.Reason,
+		&leave.Status,
+		&leave.ReasonStatus,
+		&leave.CreatedAt,
+		&leave.UpdatedAt,
+		&leave.Name,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // Tidak ditemukan
+		}
+		return nil, err
+	}
+
+	// Parse LeaveDateJoin ke []time.Time
+	if leave.LeaveDateJoin != "" {
+		dateStrings := strings.Split(leave.LeaveDateJoin, ",")
+		for _, ds := range dateStrings {
+			parsedDate, err := time.Parse("2006-01-02", strings.TrimSpace(ds))
+			if err == nil {
+				leave.LeaveDate = append(leave.LeaveDate, parsedDate)
+			}
+		}
+	}
+
+	return &leave, nil
+}
+
+func (model LeaveModel) UpdateLeaveStatus(approvalLeave entities.ApprovalLeave) error {
+	query := `
+		UPDATE leave_employee
+		SET status = ?, reason_status = ?, updated_at = ?
+		WHERE id = ? AND deleted_at IS NULL
+	`
+	_, err := model.db.Exec(
+		query,
+		approvalLeave.Status,
+		approvalLeave.ReasonStatus,
+		time.Now(),
+		approvalLeave.Id,
+	)
+	return err
 }
