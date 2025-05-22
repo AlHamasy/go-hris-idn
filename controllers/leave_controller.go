@@ -58,6 +58,14 @@ func SubmitLeave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	isValid, errMsg := helpers.IsLeaveDateValid(leaveDate)
+	if !isValid {
+		data["error"] = errMsg
+		data["leave"] = submitLeave
+		helpers.RenderTemplate(w, template, data)
+		return
+	}
+
 	errSubmit := leaveModel.InsertLeave(submitLeave)
 	if (errSubmit) != nil {
 		data["error"] = "Error " + errSubmit.Error()

@@ -46,3 +46,18 @@ const (
 	APPROVED_LEAVE = 2
 	REJECTED_LEAVE = 3
 )
+
+func IsLeaveDateValid(dates []string) (bool, string) {
+	today := time.Now().Truncate(24 * time.Hour)
+
+	for _, d := range dates {
+		parsedDate, err := time.Parse("2006-01-02", d)
+		if err != nil {
+			return false, "Format tanggal tidak valid: " + d
+		}
+		if !parsedDate.After(today) {
+			return false, "Tanggal cuti tidak boleh hari ini atau tanggal yang sudah lewat: " + d
+		}
+	}
+	return true, ""
+}
